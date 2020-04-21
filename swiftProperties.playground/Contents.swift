@@ -242,3 +242,27 @@ class SomeClass {
 SomeStructure.storedTypeProperty
 SomeStructure.storedTypeProperty = "Some different value"
 SomeClass.computedTypeProperty
+
+
+//MARK: - Personal Questions
+
+//Computed properties with optional "setters" must back calculate the other variables that lead to its value
+struct Water {
+    var bottles = 12.55
+    var bottleSize = 12.3
+    var waterWeight: Double {
+        get { bottles * bottleSize }
+        set(newWaterWeight) {
+            //Assume 1L bottleSize
+            bottleSize = 1
+            bottles = newWaterWeight / bottleSize
+        }
+
+    }
+}
+var water = Water()
+water.waterWeight
+water.waterWeight = 666
+print(water.waterWeight)
+print(water.bottles)
+print(water.bottleSize)
