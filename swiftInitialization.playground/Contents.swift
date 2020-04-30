@@ -295,9 +295,76 @@ enum TemperatureUnit {
 }
 //Failable Initializers for Enums with Raw Values
 //Enums with raw values automatically receive a failable initializer.
-enum TemperatureUnit2 {
+enum TemperatureUnit2: Character {
     case kelvin = "K", celsius = "C", fahrenheit = "F"
 }
-
 let unknownUnit = TemperatureUnit2(rawValue: "X")
 //unknownUnit is nil
+
+//Propagation of Initialization Failure
+//A failable initializer of a class, struct, or enum can delegate across to another failable initializer within the same unit. Subclass failalbe initializer can delegate up to a superclass initializer.
+class Product {
+    let name: String
+    init?(name: String) {
+        if name.isEmpty { return nil}
+        self.name = name
+    }
+}
+class CartItem: Product {
+    let quantity: Int
+    //If quantity is invalid, the entire initialization process fails
+    init?(name: String, quantity: Int) {
+        if quantity < 1 { return nil}
+        self.quantity = quantity
+        super.init(name: name)
+    }
+}
+//Overriding a Failable Initializer
+//You can overrride a superclass failable initializer in a subclass.
+//Additionally, you can overrirde a superclass failable initializer with a subclass nonfailable initializer
+class Document {
+    var name: String?
+    //Initializer creates a nil name value
+    init() {}
+    //Initializer creates a nonemtpy name value
+    init?(name: String) {
+        if name.isEmpty { return nil }
+        self.name = name
+        
+    }
+}
+//AutomaticallyNamedDocument overrides both of the designated initializers of Document. This ensures that an Automatically named document always has a consistent name
+class AutomaticallyNamedDoc: Document {
+    //Instead of nil name value, place "Untitled"
+    override init() {
+        super.init()
+        self.name = "[Untitled]"
+    }
+    override init(name: String) {
+        super.init()
+        //Instead of nil Document, rename to "Untitled"
+        if name.isEmpty {
+            self.name = "[Untitled]"
+        }
+        else {
+            self.name = name
+        }
+    }
+}
+
+// MARK: - Required Initializers
+//"required" modifier before the definition of a class initializer means that every sublcass of the class must implment it
+class SomeClass {
+    required init() {
+    }
+}
+//"required" modifier before every subclass implementation of a required initializer.
+class SomeSubClass: SomeClass {
+    required init() {
+        //subclass implementation of a required initializer goes here
+    }
+}
+
+
+
+
